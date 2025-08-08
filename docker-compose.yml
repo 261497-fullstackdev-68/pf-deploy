@@ -13,7 +13,7 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
     restart: always
     networks:
-      - pf-net
+      - ${PROJECT_NAME}-net
 
   backend:
     image: botthice/preflight-project-backend:latest
@@ -32,7 +32,7 @@ services:
     networks:
       - pf-net
 
-  frontend:
+frontend:
     image: botthice/preflight-project-frontend
     container_name: ${PROJECT_NAME}-frontend
     ports: 
@@ -41,10 +41,10 @@ services:
       - FRONT_END_PORT=${FRONT_END_PORT}
       - BACK_END_URL=http://${PROJECT_NAME}-backend:3000
     networks:
-      - pf-net
+      - ${PROJECT_NAME}-net
 volumes:
-  pf-data:
+  ${PROJECT_NAME}-data:
     name: ${PROJECT_NAME}-pf-data
 networks:
-  pf-net:
+  ${PROJECT_NAME}-net:
     name: ${PROJECT_NAME}-pf-net
