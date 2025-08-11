@@ -14,6 +14,11 @@ services:
     restart: always
     networks:
       - ${PROJECT_NAME}-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   backend:
     image: botthice/preflight-project-backend:latest
@@ -29,7 +34,8 @@ services:
       - POSTGRES_HOST=${PROJECT_NAME}-db
     command: sh -c "npm run db:migrate && npm run start"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - g11-net
 
@@ -39,10 +45,15 @@ services:
     ports: 
       - ${FRONT_END_PORT}:${FRONT_END_PORT}
     environment:
+      - TZ=Asia/Bangkok
       - FRONT_END_PORT=${FRONT_END_PORT}
       - BACK_END_URL=http://${PROJECT_NAME}-backend:3000
     networks:
       - g11-net
+    depends_on:
+      - db
+      - backend
+
 volumes:
   g11-data:
 networks:
